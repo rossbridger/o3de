@@ -34,7 +34,7 @@
         "Gems/EditorPythonBindings",
         "Gems/EMotionFX",
         "Gems/ExpressionEvaluation",
-        "Gems/FastNoise",
+        "Gems/FastNoiseGradient",
         "Gems/GameState",
         "Gems/GameStateSamples",
         "Gems/Gestures",
