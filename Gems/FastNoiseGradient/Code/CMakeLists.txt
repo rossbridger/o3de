@@ -24,6 +24,7 @@ ly_add_target(
         PRIVATE
             AZ::AzFramework
             Gem::LmbrCentral
+            3rdParty::FastNoise
 )
 
 ly_add_target(
