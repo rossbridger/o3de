@@ -1,0 +1,16 @@
+ encoder/basisu_astc_hdr_6x6_enc.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/encoder/basisu_astc_hdr_6x6_enc.cpp b/encoder/basisu_astc_hdr_6x6_enc.cpp
+index 684982b..af49469 100644
+--- a/encoder/basisu_astc_hdr_6x6_enc.cpp
++++ b/encoder/basisu_astc_hdr_6x6_enc.cpp
+@@ -25,6 +25,8 @@
+ #include <array>
+ #include <cfloat>
+ 
++#pragma warning(disable: 4296) // expression is always true/false
++
+ using namespace basisu;
+ using namespace buminiz;
+ using namespace basist::astc_6x6_hdr;

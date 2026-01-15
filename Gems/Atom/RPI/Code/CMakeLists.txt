@@ -278,6 +278,7 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
                 Gem::${gem_name}.Edit
                 Gem::${gem_name}.Public
                 3rdParty::meshoptimizer
+                3rdParty::basisu_encoder
     )
 
     ly_add_target(
