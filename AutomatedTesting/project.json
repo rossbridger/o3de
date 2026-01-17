@@ -28,7 +28,7 @@
         "EditorModeFeedback",
         "EditorPythonBindings",
         "ExpressionEvaluation",
-        "FastNoise",
+        "FastNoiseGradient",
         "Gestures",
         "GradientSignal",
         "GraphCanvas",
