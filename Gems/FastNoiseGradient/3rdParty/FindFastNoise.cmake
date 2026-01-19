@@ -39,6 +39,7 @@ endfunction()
 GetFastNoise2()
 unset(GetFastNoise2)
 
+target_compile_options(FastSIMD ${O3DE_COMPILE_OPTION_DISABLE_WARNINGS})
 target_compile_options(FastNoise ${O3DE_COMPILE_OPTION_DISABLE_WARNINGS})
 target_compile_options(FastSIMD_FastNoise ${O3DE_COMPILE_OPTION_DISABLE_WARNINGS})
 
