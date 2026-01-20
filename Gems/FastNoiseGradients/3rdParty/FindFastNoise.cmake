@@ -14,14 +14,14 @@ function(GetFastNoise2)
     include(FetchContent)
     set(FASTNOISE_GIT_REPO "https://github.com/Auburn/FastNoise2.git")
     set(FASTNOISE_GIT_TAG "v1.0")
-    set(FASTNOISE_GIT_HASH "75c5a2cab7b77ef4103ef0f8d5f34833cfdf2ec3")
+    set(FASTNOISE_GIT_HASH "83cd82ca0e799bb3b5a91d1113774d9fe73ffb03")
     FetchContent_Declare(
             FastNoise2
             GIT_REPOSITORY ${FASTNOISE_GIT_REPO}
             GIT_TAG ${FASTNOISE_GIT_HASH}
             GIT_SHALLOW TRUE
     )
-    message(STATUS "FastNoiseGradient Gem uses ${FASTNOISE_GIT_REPO} ${FASTNOISE_GIT_TAG} (MIT)")
+    message(STATUS "FastNoiseGradients Gem uses ${FASTNOISE_GIT_REPO} ${FASTNOISE_GIT_TAG} (MIT)")
 
     set(CMAKE_MESSAGE_LOG_LEVEL ${O3DE_FETCHCONTENT_MESSAGE_LEVEL})
     set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)

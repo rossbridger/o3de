@@ -12,7 +12,7 @@ endif()
 
 set(FASTNOISE_GIT_REPO "https://github.com/Auburn/FastNoise2.git")
 set(FASTNOISE_GIT_TAG "v1.0")
-message(STATUS "FastNoiseGradient Gem uses ${FASTNOISE_GIT_REPO} ${FASTNOISE_GIT_TAG} (MIT)")
+message(STATUS "FastNoiseGradients Gem uses ${FASTNOISE_GIT_REPO} ${FASTNOISE_GIT_TAG} (MIT)")
 
 add_library(FastNoise STATIC IMPORTED GLOBAL)
 add_library(3rdParty::FastNoise ALIAS FastNoise)

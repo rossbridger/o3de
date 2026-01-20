@@ -6,7 +6,7 @@
 #
 #
 
-o3de_gem_setup("FastNoiseGradient")
+o3de_gem_setup("FastNoiseGradients")
 
 add_subdirectory(Code)
 
