@@ -11,7 +11,7 @@ if (TARGET 3rdParty::FastNoise)
 endif()
 
 set(FASTNOISE_GIT_REPO "https://github.com/Auburn/FastNoise2.git")
-set(FASTNOISE_GIT_TAG "v1.0")
+set(FASTNOISE_GIT_TAG "v1.1.1")
 message(STATUS "FastNoiseGradients Gem uses ${FASTNOISE_GIT_REPO} ${FASTNOISE_GIT_TAG} (MIT)")
 
 add_library(FastNoise STATIC IMPORTED GLOBAL)

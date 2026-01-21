@@ -13,8 +13,8 @@ endif()
 function(GetFastNoise2)
     include(FetchContent)
     set(FASTNOISE_GIT_REPO "https://github.com/Auburn/FastNoise2.git")
-    set(FASTNOISE_GIT_TAG "v1.0")
-    set(FASTNOISE_GIT_HASH "83cd82ca0e799bb3b5a91d1113774d9fe73ffb03")
+    set(FASTNOISE_GIT_TAG "v1.1.1")
+    set(FASTNOISE_GIT_HASH "903c1f2d2f9d53ddce94cd223f32727d9ab3aeaa")
     FetchContent_Declare(
             FastNoise2
             GIT_REPOSITORY ${FASTNOISE_GIT_REPO}
