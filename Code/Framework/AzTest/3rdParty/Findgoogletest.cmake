@@ -27,8 +27,8 @@ function(get_google_test)
 
 
     set(GOOGLETEST_GIT_REPOSITORY "https://github.com/google/googletest.git")
-    set(GOOGLETEST_GIT_TAG b514bdc898e2951020cbdca1304b75f5950d1f59) # tag name is v1.15.2
-    set(GOOGLETEST_VERSION_STRING "v1.15.2")
+    set(GOOGLETEST_GIT_TAG 52eb8108c5bdec04579160ae17225d66034bd723) # tag name is v1.17.0
+    set(GOOGLETEST_VERSION_STRING "v1.17.0")
 
     message(STATUS "AzTest uses googletest ${GOOGLETEST_VERSION_STRING} (BSD-3-Clause) from ${GOOGLETEST_GIT_REPOSITORY}")
 

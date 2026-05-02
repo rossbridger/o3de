@@ -23,7 +23,7 @@ endif()
 
 # This file is run when in pre-built installer mode, and thus GTest and GMock are pre-built static libraries
 # ALWAYS DISCLOSE THE USE OF 3rd Party Libraries.  Even if they are internally linked.
-message(STATUS "AzTest library uses googletest v1.15.2 (BSD-3-Clause) from https://github.com/google/googletest.git")
+message(STATUS "AzTest library uses googletest v1.17.0 (BSD-3-Clause) from https://github.com/google/googletest.git")
 
 set(BASE_LIBRARY_FOLDER "${LY_ROOT_FOLDER}/lib/${PAL_PLATFORM_NAME}")
 
