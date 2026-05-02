@@ -24,7 +24,7 @@ function(GetAssimp)
     include(FetchContent)
 
     set(ASSIMP_GIT_REPO "https://github.com/assimp/assimp.git")
-    set(ASSIMP_GIT_TAG "e0b52347c6e52de2827ec957a9ebf00ce3c54f79")
+    set(ASSIMP_GIT_TAG "392a658f9c271be965271f45e7521a1b80ea4392")
     set(ASSIMP_GIT_PATCH "${CMAKE_CURRENT_LIST_DIR}/tinyusd-include.patch")
 
     FetchContent_Declare(
@@ -37,7 +37,7 @@ function(GetAssimp)
     )
 
     # please always be really clear about what third parties your gem uses.
-    message(STATUS "SDKWrapper Tool uses Assimp v6.0.4 (Custom BSD-3-Clause) ${ASSIMP_GIT_REPO}")
+    message(STATUS "SDKWrapper Tool uses Assimp v6.0.5 (Custom BSD-3-Clause) ${ASSIMP_GIT_REPO}")
 
     # Part 2: Set the build settings and trigger the actual execution of the downloaded CMakeLists.txt file
 
