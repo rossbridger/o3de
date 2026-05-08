@@ -1,0 +1,33 @@
+{
+    "Type": "JsonSerialization",
+    "Version": 1,
+    "ClassName": "PassRequest",
+    "ClassData": {
+        "Name": "VolumetricCloudsPass",
+        "TemplateName": "VolumetricCloudsTemplate",
+        "Enabled": true,
+        "Connections": [
+            {
+                "LocalSlot": "SpecularInputOutput",
+                "AttachmentRef": {
+                    "Pass": "SkyBoxPass",
+                    "Attachment": "SpecularInputOutput"
+                }
+            },
+            {
+                "LocalSlot": "ReflectionInputOutput",
+                "AttachmentRef": {
+                    "Pass": "SkyBoxPass",
+                    "Attachment": "ReflectionInputOutput"
+                }
+            },
+            {
+                "LocalSlot": "InputDepthStencil",
+                "AttachmentRef": {
+                    "Pass": "SkyBoxPass",
+                    "Attachment": "SkyBoxDepth"
+                }
+            }
+        ]
+    }
+}

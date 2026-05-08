@@ -96,6 +96,7 @@
         "Gems/Vegetation",
         "Gems/VideoPlaybackFramework",
         "Gems/VirtualGamepad",
+        "Gems/VolumetricClouds",
         "Gems/WhiteBox"
     ],
     "gem_names": [
