@@ -1,0 +1,105 @@
+{
+    "Type": "JsonSerialization",
+    "Version": 1,
+    "ClassName": "PassAsset",
+    "ClassData": {
+        "PassTemplate": {
+            "Name": "VolumetricCloudsParentTemplate",
+            "PassClass": "ParentPass",
+            "Slots": [
+                {
+                    "Name": "SpecularInputOutput",
+                    "SlotType": "InputOutput"
+                },
+                {
+                    "Name": "ReflectionInputOutput",
+                    "SlotType": "InputOutput"
+                },
+                {
+                    "Name": "InputDepthStencil",
+                    "SlotType": "Input",
+                    "ScopeAttachmentUsage": "Shader",
+                    "ImageViewDesc": {
+                        "AspectFlags": [
+                            "Depth"
+                        ]
+                    }
+                }
+            ],
+            "PassRequest": [
+                {
+                    "Name": "VolumetricCloudsComputePass",
+                    "TemplateName": "VolumetricCloudsComputeTemplate",
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputDepthStencil",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "InputDepthStencil"
+                            }
+                        },
+                        {
+                            "LocalSlot": "CloudStorageOutput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "CloudStorage"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Name": "VolumetricCloudsComposePass",
+                    "TemplateName": "VolumetricComposePassTemplate",
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputDepthStencil",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "InputDepthStencil"
+                            }
+                        },
+                        {
+                            "LocalSlot": "CloudStorageInput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "CloudStorage"
+                            }
+                        },
+                        {
+                            "LocalSlot": "SpecularInputOutput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "SpecularInputOutput"
+                            }
+                        },
+                        {
+                            "LocalSlot": "ReflectionInputOutput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "ReflectionInputOutput"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "ImageAttachments": [
+                {
+                    "Name": "CloudStorage",
+                    "SizeSource": {
+                        "Source": {
+                            "Pass": "This",
+                            "Attachment": "SpecularInputOutput"
+                        },
+                        "Multipliers": { // TODO: downsample to 1/4 of the screen size
+                            "WidthMultiplier": 1.0,
+                            "HeightMultiplier": 1.0
+                        }
+                    },
+                    "ImageDescriptor": {
+                        "Format": "R16G16B16A16_FLOAT"
+                    }
+                }
+            ]
+        }
+    }
+}

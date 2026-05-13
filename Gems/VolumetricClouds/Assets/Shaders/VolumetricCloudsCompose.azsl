@@ -19,6 +19,7 @@ ShaderResourceGroup PassSrg : SRG_PerPass_WithFallback
     Texture3D<float4> m_highFreqNoiseTexture;
     Texture2D<float4> m_weatherMapTexture;
     Texture2D<float4> m_curlNoiseTexture;
+    Texture2D<float4> m_cloudStorageTexture;
 
     Sampler LinearWrapSampler
     {

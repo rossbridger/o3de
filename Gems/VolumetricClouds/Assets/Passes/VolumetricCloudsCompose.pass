@@ -4,18 +4,14 @@
     "ClassName": "PassAsset",
     "ClassData": {
         "PassTemplate": {
-            "Name": "VolumetricCloudsTemplate",
+            "Name": "VolumetricCloudsComposePassTemplate",
             "PassClass": "FullScreenTriangle",
             "Slots": [
                 {
-                    "Name": "SpecularInputOutput",
-                    "SlotType": "InputOutput",
-                    "ScopeAttachmentUsage": "RenderTarget"
-                },
-                {
-                    "Name": "ReflectionInputOutput",
-                    "SlotType": "InputOutput",
-                    "ScopeAttachmentUsage": "RenderTarget"
+                    "Name": "CloudStorageInput",
+                    "SlotType": "Input",
+                    "ShaderInputName": "m_cloudStorageTexture",
+                    "ScopeAttachmentUsage": "Shader"
                 },
                 {
                     "Name": "InputDepthStencil",
@@ -27,12 +23,22 @@
                             "Depth"
                         ]
                     }
+                },
+                {
+                    "Name": "SpecularInputOutput",
+                    "SlotType": "InputOutput",
+                    "ScopeAttachmentUsage": "RenderTarget"
+                },
+                {
+                    "Name": "ReflectionInputOutput",
+                    "SlotType": "InputOutput",
+                    "ScopeAttachmentUsage": "RenderTarget"
                 }
             ],
             "PassData": {
                 "$type": "FullscreenTrianglePassData",
                 "ShaderAsset": {
-                    "FilePath": "Shaders/VolumetricClouds.shader"
+                    "FilePath": "Shaders/VolumetricCloudsCompose.shader"
                 },
                 "BindViewSrg": true
             }

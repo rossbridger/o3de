@@ -1,7 +1,7 @@
 {
-    "Source" : "VolumetricClouds.azsl",
+    "Source" : "VolumetricCloudsCompose.azsl",
     "DepthStencilState" : {
-        "Depth": 
+        "Depth":
         {
             "Enable": false,  //required to bind depth buffer SRV
             "CompareFunc" : "Always"
