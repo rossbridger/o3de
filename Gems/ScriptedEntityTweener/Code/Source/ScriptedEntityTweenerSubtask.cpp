@@ -12,6 +12,10 @@
 
 #include "ScriptedEntityTweenerSubtask.h"
 
+AZ_PUSH_DISABLE_WARNING(4244, "-Wunknown-warning-option")
+#include "ScriptedEntityTweenerMath.h"
+AZ_POP_DISABLE_WARNING
+
 namespace ScriptedEntityTweener
 {
     namespace SubtaskHelper
@@ -103,7 +107,7 @@ namespace ScriptedEntityTweener
             float targetValue;
             m_valueTarget.GetValue(targetValue);
 
-            currentValue.SetValue(AzFramework::EasingEquations::GetEasingResult(m_animationProperties.m_easeMethod, m_animationProperties.m_easeType, timeAnimationActive, m_animationProperties.m_timeDuration, initialValue, targetValue));
+            currentValue.SetValue(EasingEquations::GetEasingResult(m_animationProperties.m_easeMethod, m_animationProperties.m_easeType, timeAnimationActive, m_animationProperties.m_timeDuration, initialValue, targetValue));
 
             SetVirtualValue(currentValue);
         }
@@ -115,7 +119,7 @@ namespace ScriptedEntityTweener
             AZ::Vector3 targetValue;
             m_valueTarget.GetValue(targetValue);
 
-            currentValue.SetValue(AzFramework::EasingEquations::GetEasingResult(m_animationProperties.m_easeMethod, m_animationProperties.m_easeType, timeAnimationActive, m_animationProperties.m_timeDuration, initialValue, targetValue));
+            currentValue.SetValue(EasingEquations::GetEasingResult(m_animationProperties.m_easeMethod, m_animationProperties.m_easeType, timeAnimationActive, m_animationProperties.m_timeDuration, initialValue, targetValue));
 
             SetVirtualValue(currentValue);
         }
@@ -127,7 +131,7 @@ namespace ScriptedEntityTweener
             AZ::Quaternion targetValue;
             m_valueTarget.GetValue(targetValue);
 
-            currentValue.SetValue(AzFramework::EasingEquations::GetEasingResult(m_animationProperties.m_easeMethod, m_animationProperties.m_easeType, timeAnimationActive, m_animationProperties.m_timeDuration, initialValue, targetValue));
+            currentValue.SetValue(EasingEquations::GetEasingResult(m_animationProperties.m_easeMethod, m_animationProperties.m_easeType, timeAnimationActive, m_animationProperties.m_timeDuration, initialValue, targetValue));
 
             SetVirtualValue(currentValue);
         }
