@@ -1,0 +1,17 @@
+set(FILES
+    Include/RoadSystem/RoadTypes.h
+    Include/RoadSystem/RoadComponentBus.h
+    Include/RoadSystem/RoadSystemBus.h
+    Source/RoadSystemComponent.h
+    Source/RoadSystemComponent.cpp
+    Source/Components/RoadShape.h
+    Source/Components/RoadShape.cpp
+    Source/Components/RoadComponent.h
+    Source/Components/RoadComponent.cpp
+    Source/Rendering/RoadBuffer.h
+    Source/Rendering/RoadAttributeBuffer.h
+    Source/Rendering/RoadRenderMesh.h
+    Source/Rendering/RoadRenderMesh.cpp
+    Source/Util/RoadGeometryUtil.h
+    Source/Util/RoadGeometryUtil.cpp
+)

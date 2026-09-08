@@ -69,6 +69,7 @@
         "Gems/QtForPython",
         "Gems/RecastNavigation",
         "Gems/RemoteTools",
+        "Gems/RoadSystem",
         "Gems/SaveData",
         "Gems/SceneLoggingExample",
         "Gems/SceneProcessing",
