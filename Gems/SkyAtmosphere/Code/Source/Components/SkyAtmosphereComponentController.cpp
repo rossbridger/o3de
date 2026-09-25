@@ -9,6 +9,7 @@
 #include <Atom/Feature/SkyBox/SkyboxConstants.h>
 #include <Components/SkyAtmosphereComponentController.h>
 #include <AtomLyIntegration/CommonFeatures/CoreLights/DirectionalLightBus.h>
+#include <Atom/RPI.Public/Image/StreamingImage.h>
 
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
@@ -62,8 +63,6 @@ namespace SkyAtmosphere
                 SKY_VIRTUAL_PROPERTY(SunFalloffFactor, Factor)
                 SKY_VIRTUAL_PROPERTY(SunRadiusFactor, Factor)
                 SKY_VIRTUAL_PROPERTY(SunDirection, Direction)
-                SKY_VIRTUAL_PROPERTY(FastSkyEnabled, Enabled)
-                SKY_VIRTUAL_PROPERTY(FastAerialPerspectiveEnabled, Enabled)
                 SKY_VIRTUAL_PROPERTY(AerialPerspectiveEnabled, Enabled)
                 SKY_VIRTUAL_PROPERTY(NearClip, NearClip)
                 SKY_VIRTUAL_PROPERTY(NearFadeDistance, Distance)
@@ -105,8 +104,6 @@ namespace SkyAtmosphere
         // general params
         params.m_absorption = m_configuration.m_absorption * m_configuration.m_absorptionScale;
         params.m_atmosphereRadius = m_configuration.m_groundRadius + m_configuration.m_atmosphereHeight;
-        params.m_fastSkyEnabled = m_configuration.m_fastSkyEnabled;
-        params.m_fastAerialPerspectiveEnabled = m_configuration.m_fastAerialPerspectiveEnabled;
         params.m_aerialPerspectiveEnabled = m_configuration.m_aerialPerspectiveEnabled;
         params.m_aerialDepthFactor = m_configuration.m_aerialDepthFactor;
         params.m_groundAlbedo = m_configuration.m_groundAlbedo;
@@ -189,6 +186,31 @@ namespace SkyAtmosphere
         {
             params.m_planetOrigin = AZ::Vector3::CreateZero();
         }
+
+        // volumetric clouds params
+        params.m_volumetricCloudsEnabled = m_configuration.m_volumetricCloudsEnabled;
+        params.m_cloudsBottomHeight = m_configuration.m_cloudsBottomHeight;
+        params.m_cloudsTopHeight = m_configuration.m_cloudsTopHeight;
+        params.m_baseScale = m_configuration.m_baseScale;
+        params.m_detailScale = m_configuration.m_detailScale;
+        params.m_weatherScale = m_configuration.m_weatherScale;
+        params.m_globalCoverage = m_configuration.m_globalCoverage;
+        params.m_globalDensity = m_configuration.m_globalDensity;
+        params.m_anvilBias = m_configuration.m_anvilBias;
+        params.m_baseMultiplier = m_configuration.m_baseMultiplier;
+        params.m_detailMultiplier = m_configuration.m_detailMultiplier;
+        params.m_curliness = m_configuration.m_curliness;
+        params.m_eccentricity = m_configuration.m_eccentricity;
+        params.m_intensity = m_configuration.m_intensity;
+        params.m_spread = m_configuration.m_spread;
+        params.m_ambientStrength = m_configuration.m_ambientStrength;
+        params.m_windSpeed = m_configuration.m_windSpeed;
+        params.m_windDirection = m_configuration.m_windDirection;
+        params.m_cloudAbsorption = m_configuration.m_cloudAbsorption;
+        params.m_lowFreqTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_lowFreqTextureAsset);
+        params.m_highFreqTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_highFreqTextureAsset);
+        params.m_weatherMapTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_weatherTextureAsset);
+        params.m_curlNoiseTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_curlNoiseTextureAsset);
     }
 
     void SkyAtmosphereComponentController::Activate(AZ::EntityId entityId)
@@ -529,31 +551,6 @@ namespace SkyAtmosphere
         }
         return AZ::Vector3::CreateAxisY();
     }
-
-
-    void SkyAtmosphereComponentController::SetFastSkyEnabled(bool enabled)
-    {
-        m_configuration.m_fastSkyEnabled = enabled;
-        OnParamUpdated();
-    }
-
-    bool SkyAtmosphereComponentController::GetFastSkyEnabled()
-    {
-        return m_configuration.m_fastSkyEnabled;
-    }
-
-
-    void SkyAtmosphereComponentController::SetFastAerialPerspectiveEnabled(bool enabled)
-    {
-        m_configuration.m_fastAerialPerspectiveEnabled = enabled;
-        OnParamUpdated();
-    }
-
-    bool SkyAtmosphereComponentController::GetFastAerialPerspectiveEnabled()
-    {
-        return m_configuration.m_fastAerialPerspectiveEnabled;
-    }
-
 
     void SkyAtmosphereComponentController::SetAerialPerspectiveEnabled(bool enabled)
     {

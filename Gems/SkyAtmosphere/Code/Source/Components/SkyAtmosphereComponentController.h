@@ -111,12 +111,6 @@ namespace SkyAtmosphere
         AZ::Vector3 GetSunDirection() override;
 
         //! Advanced
-        void SetFastSkyEnabled(bool enabled) override;
-        bool GetFastSkyEnabled() override;
-
-        void SetFastAerialPerspectiveEnabled(bool enabled) override;
-        bool GetFastAerialPerspectiveEnabled() override;
-
         void SetAerialPerspectiveEnabled(bool enabled) override;
         bool GetAerialPerspectiveEnabled() override;
 

@@ -64,6 +64,12 @@
                     "ImageViewDesc": {
                         "IsArray": 1
                     }
+                },
+                {
+                    "Name": "CloudColorImage",
+                    "SlotType": "Input",
+                    "ScopeAttachmentUsage": "Shader",
+                    "ShaderInputName": "m_cloudColorImage"
                 }
             ],
             "PassData": {

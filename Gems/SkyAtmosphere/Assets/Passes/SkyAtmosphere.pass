@@ -64,6 +64,27 @@
                     ]
                 },
                 {
+                    "Name": "SkyVolumetricCloudsPass",
+                    "TemplateName": "SkyVolumetricCloudsTemplate",
+                    "Enabled": true,
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputDepthStencil",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "SkyBoxDepth"
+                            }
+                        },
+                        {
+                            "LocalSlot": "CloudColorImage",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "CloudColorImage"
+                            }
+                        }
+                    ]
+                },
+                {
                     "Name": "SkyRayMarchingPass",
                     "TemplateName": "SkyRayMarchingTemplate",
                     "Enabled": true,
@@ -123,8 +144,33 @@
                                 "Pass": "Parent",
                                 "Attachment": "DirectionalESM"
                             }
+                        },
+                        {
+                            "LocalSlot": "CloudColorImage",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "CloudColorImage"
+                            }
                         }
                     ]
+                }
+            ],
+            "ImageAttachments": [
+                {
+                    "Name": "CloudColorImage",
+                    "SizeSource": {
+                        "Source": {
+                            "Pass": "This",
+                            "Attachment": "SpecularInputOutput"
+                        },
+                        "Multipliers": { // TODO: initialize it in C++ as other attachments so that it won't cost video memory when disabled
+                            "WidthMultiplier": 0.25,
+                            "HeightMultiplier": 0.25
+                        }
+                    },
+                    "ImageDescriptor": {
+                        "Format": "R16G16B16A16_FLOAT"
+                    }
                 }
             ]
         }

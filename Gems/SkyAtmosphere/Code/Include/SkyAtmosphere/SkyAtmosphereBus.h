@@ -151,18 +151,6 @@ namespace SkyAtmosphere
         //! @return the sun direction
         virtual AZ::Vector3 GetSunDirection() = 0;
 
-        //! Enable using a look up table for all sky pixels that are not obstructed
-        //! @param enabled Whether to enable or disable fast sky 
-        virtual void SetFastSkyEnabled(bool enabled) = 0;
-        //! @return whether fast sky is enabled 
-        virtual bool GetFastSkyEnabled() = 0;
-
-        //! Enable using a look up table for all sky pixels that are obstructed
-        //! @param enabled Whether to enable or disable fast aerial perspective 
-        virtual void SetFastAerialPerspectiveEnabled(bool enabled) = 0;
-        //! @return whether fast aerial perspective is enabled
-        virtual bool GetFastAerialPerspectiveEnabled() = 0;
-
         //! Enable or disable drawing aerial perspective on top of the scene.
         //! This can be used to speed up indoor scenes
         //! @param enabled Whether to enable or aerial perspective 

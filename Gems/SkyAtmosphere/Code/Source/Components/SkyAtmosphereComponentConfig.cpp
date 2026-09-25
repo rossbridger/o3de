@@ -8,6 +8,7 @@
 
 #include <SkyAtmosphere/SkyAtmosphereComponentConfig.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Asset/AssetSerializer.h>
 
 namespace SkyAtmosphere
 {
@@ -16,7 +17,7 @@ namespace SkyAtmosphere
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serializeContext->Class<SkyAtmosphereComponentConfig, ComponentConfig>()
-                ->Version(2)
+                ->Version(3)
                 ->Field("OriginMode", &SkyAtmosphereComponentConfig::m_originMode)
                 ->Field("AtmosphereHeight", &SkyAtmosphereComponentConfig::m_atmosphereHeight)
                 ->Field("GroundAlbedo", &SkyAtmosphereComponentConfig::m_groundAlbedo)
@@ -42,12 +43,33 @@ namespace SkyAtmosphere
                 ->Field("RayleighScatteringScale", &SkyAtmosphereComponentConfig::m_rayleighScatteringScale)
                 ->Field("RayleighExpDistribution", &SkyAtmosphereComponentConfig::m_rayleighExponentialDistribution)
                 ->Field("ShadowsEnabled", &SkyAtmosphereComponentConfig::m_shadowsEnabled)
-                ->Field("FastSkyEnabled", &SkyAtmosphereComponentConfig::m_fastSkyEnabled)
                 ->Field("NearClip", &SkyAtmosphereComponentConfig::m_nearClip)
                 ->Field("NearFadeDistance", &SkyAtmosphereComponentConfig::m_nearFadeDistance)
-                ->Field("FastAerialPerspectiveEnabled", &SkyAtmosphereComponentConfig::m_fastAerialPerspectiveEnabled)
                 ->Field("AerialPerspectiveEnabled", &SkyAtmosphereComponentConfig::m_aerialPerspectiveEnabled)
                 ->Field("AerialDepthFactor", &SkyAtmosphereComponentConfig::m_aerialDepthFactor)
+                ->Field("VolumetricCloudsEnabled", &SkyAtmosphereComponentConfig::m_volumetricCloudsEnabled)
+                ->Field("CloudsBottomHeight", &SkyAtmosphereComponentConfig::m_cloudsBottomHeight)
+                ->Field("CloudsTopHeight", &SkyAtmosphereComponentConfig::m_cloudsTopHeight)
+                ->Field("BaseScale", &SkyAtmosphereComponentConfig::m_baseScale)
+                ->Field("DetailScale", &SkyAtmosphereComponentConfig::m_detailScale)
+                ->Field("WeatherScale", &SkyAtmosphereComponentConfig::m_weatherScale)
+                ->Field("GlobalCoverage", &SkyAtmosphereComponentConfig::m_globalCoverage)
+                ->Field("WindSpeed", &SkyAtmosphereComponentConfig::m_windSpeed)
+                ->Field("WindDirection", &SkyAtmosphereComponentConfig::m_windDirection)
+                ->Field("GlobalDensity", &SkyAtmosphereComponentConfig::m_globalDensity)
+                ->Field("CloudAbsorption", &SkyAtmosphereComponentConfig::m_cloudAbsorption)
+                ->Field("AnvilBias", &SkyAtmosphereComponentConfig::m_anvilBias)
+                ->Field("BaseMultiplier", &SkyAtmosphereComponentConfig::m_baseMultiplier)
+                ->Field("DetailMultiplier", &SkyAtmosphereComponentConfig::m_detailMultiplier)
+                ->Field("Curliness", &SkyAtmosphereComponentConfig::m_curliness)
+                ->Field("Eccentricity", &SkyAtmosphereComponentConfig::m_eccentricity)
+                ->Field("Intensity", &SkyAtmosphereComponentConfig::m_intensity)
+                ->Field("Spread", &SkyAtmosphereComponentConfig::m_spread)
+                ->Field("AmbientStrength", &SkyAtmosphereComponentConfig::m_ambientStrength)
+                ->Field("LowFreqTextureAsset", &SkyAtmosphereComponentConfig::m_lowFreqTextureAsset)
+                ->Field("HighFreqTextureAsset", &SkyAtmosphereComponentConfig::m_highFreqTextureAsset)
+                ->Field("WeatherTextureAsset", &SkyAtmosphereComponentConfig::m_weatherTextureAsset)
+                ->Field("CurlNoiseTextureAsset", &SkyAtmosphereComponentConfig::m_curlNoiseTextureAsset)
                 ;
         }
     }
