@@ -27,6 +27,10 @@
             {
                 "Name": "SkyRayMarchingTemplate",
                 "Path": "Passes/SkyRayMarching.pass"
+            },
+            {
+                "Name": "SkyVolumetricCloudsTemplate",
+                "Path": "Passes/SkyVolumetricClouds.pass"
             }
         ]
     }

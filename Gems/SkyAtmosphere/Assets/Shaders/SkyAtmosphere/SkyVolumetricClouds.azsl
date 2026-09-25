@@ -1,0 +1,401 @@
+/*
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
+ *
+ */
+
+#include <viewsrg_all.srgi>
+#include <scenesrg_all.srgi>
+#include <Atom/Features/SrgSemantics.azsli>
+#include <Atom/Features/PostProcessing/FullscreenVertex.azsli>
+#include <Atom/Features/ColorManagement/TransformColor.azsli>
+
+#include <SkyAtmosphereCommon.azsli>
+
+#define NUM_STEPS 128
+#define ABSORPTION 0.0042f
+#define MAX_LIGHT_DISTANCE 1000.0f
+#define NUM_LIGHT_STEPS 4
+// Weather map
+#define COVERAGE_REPEAT 6.0
+
+// Cloud types height density gradients
+#define STRATUS_GRADIENT float4(0.0, 0.1, 0.2, 0.3)
+#define STRATOCUMULUS_GRADIENT float4(0.02, 0.2, 0.48, 0.625)
+#define CUMULUS_GRADIENT float4(0.00, 0.1625, 0.88, 0.98)
+
+
+#define BAYER_FACTOR 1.0 / 16.0
+static const float bayerFilter[16] = {
+    0.0 * BAYER_FACTOR, 8.0 * BAYER_FACTOR, 2.0 * BAYER_FACTOR, 10.0 * BAYER_FACTOR,
+    12.0 * BAYER_FACTOR, 4.0 * BAYER_FACTOR, 14.0 * BAYER_FACTOR, 6.0 * BAYER_FACTOR,
+    3.0 * BAYER_FACTOR, 11.0 * BAYER_FACTOR, 1.0 * BAYER_FACTOR, 9.0 * BAYER_FACTOR,
+    15.0 * BAYER_FACTOR, 7.0 * BAYER_FACTOR, 13.0 * BAYER_FACTOR, 5.0 * BAYER_FACTOR
+};
+
+
+// Earth
+// These values are not physically correct, but they are used to create a nice effect
+static float earthRadius;
+static float cloudsBottomRadius;
+static float cloudsTopRadius;
+static float3 planetCenter;
+
+
+// Returns gradient for a specific cloud type
+float GetDensityGradient(float heightFraction, float cloudType)
+{
+    float stratusFactor = 1.0 - clamp(cloudType * 2.0, 0.0, 1.0);
+    float stratoCumulusFactor = 1.0 - abs(cloudType - 0.5) * 2.0;
+    float cumulusFactor = clamp(cloudType - 0.5, 0.0, 1.0) * 2.0;
+
+    float4 baseGradient = stratusFactor * STRATUS_GRADIENT
+                        + stratoCumulusFactor * STRATOCUMULUS_GRADIENT
+                        + cumulusFactor * CUMULUS_GRADIENT;
+
+    // gradient computation (see Siggraph 2017 Nubis-Decima talk)
+    return Remap(heightFraction, baseGradient.x, baseGradient.y, 0.0, 1.0)
+         * Remap(heightFraction, baseGradient.z, baseGradient.w, 1.0, 0.0);
+}
+
+// Dual lobe phase function with a modified eccentricity used in Decima engine in Nubis cloud system
+float DirectedPhase(float cosTheta, float eccentricity, float silverIntensity, float silverSpread)
+{
+    return max(HgPhase(eccentricity, cosTheta), silverIntensity * HgPhase(0.999 - silverSpread, cosTheta));
+}
+
+// Powdered sugar function
+float Powder(float d)
+{
+    return (1.0 - exp(-2.0 * d));
+}
+
+float GetHeightFraction(float3 inPos)
+{
+    return saturate((length(inPos - planetCenter) - cloudsBottomRadius) / (cloudsTopRadius - cloudsBottomRadius));
+}
+
+// Spherical uv projection
+float2 GetUVProjection(float3 pos)
+{
+    return pos.xy / cloudsBottomRadius + 0.5;
+}
+
+float SampleCloudDensity(float3 pos, bool expensive, float lod)
+{
+    // Init cloud sample
+    // Height fraction and uv coords for sampling
+    float heightFraction = GetHeightFraction(pos);
+    float windAngle = PassSrg::m_constants.m_windDirection * 2 * PI / 360.0f;
+    float windSpeed = PassSrg::m_constants.m_windSpeed * 1000;
+    float3 windDirection = float3(windSpeed * cos(windAngle), windSpeed * sin(windAngle), 0.0f);
+    float windVelocity = 0.0f;
+
+    float3 animation = heightFraction * windDirection + windVelocity * SceneSrg::m_time;
+    float2 staticUv = GetUVProjection(pos);
+    float2 animatedUv = GetUVProjection(pos + animation);
+
+    // Early exit if out of the cloud layer
+    if (heightFraction < 0.0 || heightFraction > 1.0)
+    {
+        return 0.0;
+    }
+    // Sample low frequency noise to construct FBM
+    float baseScale = PassSrg::m_constants.m_baseScale;
+    float detailScale = PassSrg::m_constants.m_detailScale;
+    float4 lowFrequencyNoise = PassSrg::m_lowFreqNoiseTexture.SampleLevel(PassSrg::LinearWrapSampler, float3(animatedUv * baseScale, heightFraction), lod);
+    float lowFreqFBM = dot(lowFrequencyNoise.gba, float3(0.625, 0.25, 0.125));
+    float baseCloud = Remap(lowFrequencyNoise.r, lowFreqFBM - 1.0, 1.0, 0.0, 1.0) * PassSrg::m_constants.m_globalDensity;
+
+    // Sample the cloud map
+    float3 cloudMap = PassSrg::m_weatherMapTexture.SampleLevel(PassSrg::LinearWrapSampler, animatedUv * COVERAGE_REPEAT, 0.0).rgb * PassSrg::m_constants.m_baseMultiplier;
+    // Coverage is in red and green channels
+    float coverage = max(cloudMap.r, saturate(PassSrg::m_constants.m_globalCoverage - 0.5) * cloudMap.g * 2);
+    coverage = pow(coverage, Remap(heightFraction, 0.7, 0.8, 1.0, lerp(1.0, 0.5, PassSrg::m_constants.m_anvilBias)));
+    // Cloud type is in the blue channel
+    float cloudType = cloudMap.b;
+
+    // Adjust the density based on the cloud type
+    float cloudTypeDensity = GetDensityGradient(heightFraction, cloudType);
+    baseCloud *= (cloudTypeDensity / max(0.001, heightFraction));
+
+    // Apply the coverage
+    float baseCloudWithCoverage = Remap(baseCloud, coverage, 1.0, 0.0, 1.0);
+    baseCloudWithCoverage = saturate(baseCloudWithCoverage * coverage);
+
+    // Check if we are doing expensive sampling
+    if (expensive)
+    {
+        // Offset the sampling coordinate of detail noise to simulate atmospheric turbulence further eroding the clouds
+        float3 p = float3(staticUv * detailScale, heightFraction);
+        if (PassSrg::m_constants.m_curliness > 0.0)
+        {
+            float2 curlNoise = PassSrg::m_curlNoiseTexture.SampleLevel(PassSrg::LinearWrapSampler, staticUv * 5.0, 0.0).xy;
+            p.xy += curlNoise * (1.0 - heightFraction) * PassSrg::m_constants.m_curliness;
+        }
+
+        // Sample high frequency noise and build the FBM
+        float3 highFrequencyNoise = PassSrg::m_highFreqNoiseTexture.SampleLevel(PassSrg::LinearWrapSampler, p, lod).rgb * PassSrg::m_constants.m_detailMultiplier;
+        float highFreqFBM = dot(highFrequencyNoise, float3(0.625, 0.25, 0.125));
+        float highFreqNoiseModifier = lerp(highFreqFBM, 1.0 - highFreqFBM, saturate(heightFraction * 10.0));
+        baseCloudWithCoverage = Remap(baseCloudWithCoverage, highFreqNoiseModifier, 1.0, 0.0, 1.0);
+    }
+
+    return saturate(baseCloudWithCoverage);
+}
+
+// Compute level of attenuation along a light ray
+// Using cone sampling as described by Schneider
+float LightRayAttenuation(float3 p)
+{
+    float3 dirToLight = PassSrg::m_constants.m_sunDirection;
+    float attenuationAlongLightRay = 1.0;
+    float totalDensity = 0.0;
+    float stepSize = 0.5 * (cloudsTopRadius - cloudsBottomRadius) / NUM_LIGHT_STEPS;
+
+    // Cone parameters (as described by Schneider)
+    float lastStepDistanceMultiplier = 5.0; // Last step reaches 2x further
+
+
+    // Lightmarch
+    for (int l = 0; l < NUM_LIGHT_STEPS; l++)
+    {
+        float t = (float) l / (NUM_LIGHT_STEPS - 1); // Normalized position [0,1]
+
+        // Modify the last step to reach further
+        float distanceFactor;
+        if (l == NUM_LIGHT_STEPS - 1)
+        {
+            distanceFactor = (1.0 + lastStepDistanceMultiplier) / 2.0; // Average of second-to-last and extended last
+        }
+        else
+        {
+            // Non-uniform step distribution (denser near start, sparser far away)
+            distanceFactor = t;
+        }
+
+        // Calculate step position - distance increases with each step
+        float stepDistance = distanceFactor * NUM_LIGHT_STEPS * stepSize;
+
+        // Calculate cone radius at this distance - widens as we move away
+        float coneRadius = stepDistance * tan(0.03); // 0.03 radians = ~1.7 degrees cone angle
+
+        // Offset direction based on step number (spiral pattern)
+        float angle = l * 2.4; // Golden angle in radians
+
+        // Create offset vectors perpendicular to light direction
+        float3 u, v;
+        if (abs(dirToLight.x) < 0.99)
+        {
+            u = normalize(cross(float3(1, 0, 0), dirToLight));
+        }
+        else
+        {
+            u = normalize(cross(float3(0, 1, 0), dirToLight));
+        }
+        v = cross(dirToLight, u);
+
+        // Calculate radius factor (distance from center line of the cone)
+        // t gives distance from center, square root gives uniform disc distribution
+        float r = coneRadius * sqrt(t);
+
+        // Calculate final sample position with offset
+        float3 offset = r * (cos(angle) * u + sin(angle) * v);
+        float3 samplePos = p + dirToLight * stepDistance + offset;
+
+        // Sample cloud density
+        float density = SampleCloudDensity(samplePos, false, l * 0.5);
+
+        // Accumulate density
+        totalDensity += density * stepSize * PassSrg::m_constants.m_cloudAbsorption * 0.001;
+    }
+
+    // Apply modified Beer's law for exponential light attenuation
+    // This makes sure that the bottom of the clouds is not too dark
+    return saturate(max(exp(-totalDensity), (exp(-totalDensity * 0.25)) * 0.7));
+}
+
+float4 RayMarch(uint2 threadId, float3 start, float3 end)
+{
+    float3 ray = end - start;
+
+    float rayLength = length(ray);
+    float3 rayDirection = ray / rayLength;
+
+    // Compute the base number of steps to take
+    // Cosine of angle between ray and vertical (Z axis)
+    float angleFactor = abs(rayDirection.z);
+    float numOfSteps = lerp(NUM_STEPS, NUM_STEPS * 0.5, angleFactor); // fewer steps when looking up
+    float baseStepSize = rayLength / numOfSteps;
+    float largeStepMultiplier = 3.0;
+    float smallStepMultiplier = 1.0; // For detailed sampling inside clouds
+
+    // Dither the ray start position to combat banding
+    int a = int(threadId.x) % 4;
+    int b = int(threadId.y) % 4;
+    float3 p = start + rayDirection * baseStepSize * bayerFilter[a * 4 + b] * 1.87;
+
+    // Phase function, precomputed here as the angle of the sun never changes for directional representation
+    float cosTheta = dot(normalize(PassSrg::m_constants.m_sunDirection), rayDirection);
+    float phase = DirectedPhase(cosTheta, PassSrg::m_constants.m_eccentricity, PassSrg::m_constants.m_intensity, PassSrg::m_constants.m_spread);
+
+    // Ray-marching variables
+    float transmittance = 1.0;
+    float accumulatedDensity = 0.0;
+    float inScatteredLight = 0.0;
+    float ambientLight = 0.0;
+    float currentStepSize = baseStepSize * largeStepMultiplier;
+    bool insideCloud = false;
+    bool everInCloud = false;
+    int emptyStepsCount = 0;
+
+    float remainingDistance = rayLength;
+
+    while (remainingDistance > 0.0)
+    {
+        float distanceFromCamera = length(p - ViewSrg::m_worldPosition);
+
+        float density = SampleCloudDensity(p, true, 2);
+
+        if (density > 0.05)
+        {
+            // We hit a cloud - if we were taking large steps, we need to back up and switch to small steps
+            if (!insideCloud)
+            {
+                // Back up one large step and switch to small steps
+                if (currentStepSize > baseStepSize)
+                {
+                    p -= rayDirection * currentStepSize;
+                    remainingDistance += currentStepSize;
+                    currentStepSize = baseStepSize * smallStepMultiplier;
+                    insideCloud = true;
+                    everInCloud = true;
+                    emptyStepsCount = 0;
+                    continue; // Skip this step and restart with small steps
+                }
+                else
+                {
+                    // Already using small steps, just mark that we're in a cloud
+                    insideCloud = true;
+                    everInCloud = true;
+                    emptyStepsCount = 0;
+                }
+            }
+            // Process the cloud sample
+            accumulatedDensity += density;
+
+            // compute the height fraction: relative height in cloud layer <0;1>
+            float heightFraction = GetHeightFraction(p);
+
+            // Beer-powder aprox
+            float powderTerm = Powder(accumulatedDensity);
+
+            // compute the light ray attenuation
+            float transmittanceAlongLightRay = LightRayAttenuation(p);
+
+            // in-scattering
+            float inScatterProb = 0.05 * pow(density, Remap(heightFraction, 0.3, 0.85, 0.5, 2.0));
+
+            // Ambient light
+            ambientLight += density * (1.0 - heightFraction) * transmittance;
+
+            // Compute the differential in-scattering contribution using the current transmittance
+            inScatteredLight += density * currentStepSize * transmittance * powderTerm * transmittanceAlongLightRay * phase * inScatterProb;
+
+            // Update total transmittance for extinction along the ray segment
+            float currentTransmittance = exp(-density * currentStepSize * PassSrg::m_constants.m_cloudAbsorption * 0.001);
+            transmittance *= currentTransmittance;
+
+            if (transmittance < 0.001)
+            {
+                break;
+            }
+        }
+        else
+        {
+            // No cloud here
+            emptyStepsCount++;
+
+            // If we've taken several empty steps while using small steps, switch back to large steps
+            if (insideCloud && emptyStepsCount > 5)
+            {
+                insideCloud = false;
+                currentStepSize = baseStepSize * largeStepMultiplier;
+            }
+        }
+
+        // Move one step
+        p += rayDirection * currentStepSize;
+        remainingDistance -= currentStepSize;
+
+        // Safety check to prevent infinite loops
+        if (remainingDistance < 0.0 || currentStepSize <= 0.0) {
+            break;
+        }
+    }
+
+    // Compute alpha from the accumulated optical depth,
+    // Here we base it on the remaining transmittance.
+    float alpha = 1.0 - transmittance;
+    return float4(inScatteredLight, ambientLight * PassSrg::m_constants.m_ambientStrength, 0, alpha);
+}
+
+float4 RayMarchingPS(VSOutput Input, in uint sampleIndex : SV_SampleIndex) : SV_Target
+{
+    // re-construct the world space coords
+    float2 screenCoords = Input.m_position.xy;
+    float depth = PassSrg::m_depth.Load(screenCoords, sampleIndex).r;
+    float2 ndcPos = float2(Input.m_texCoord.x, 1.0f - Input.m_texCoord.y) * 2.0f - 1.0f;
+    float4 projectedPos = float4(ndcPos, depth, 1.0f);
+    float4 positionWS = mul(ViewSrg::m_viewProjectionInverseMatrix, projectedPos);
+    float3 viewToPosition =  positionWS.xyz / positionWS.w - ViewSrg::m_worldPosition;
+    const float worldDepth = length(viewToPosition);
+    if (worldDepth < PassSrg::m_constants.m_nearClip)
+    {
+        return float4(0.0, 0.0, 0.0, 0.0);
+    }
+
+    // Get intersections
+    // For the sake of simplicity, we only account for situation where the camera is inside the atmosphere under the cloud layer
+    // Otherwise, strange things can happen
+    // This could be however changed in production code quite easily 
+    float3 rayOrigin = ViewSrg::m_worldPosition;
+    float3 rayEnd = positionWS.xyz / positionWS.w;
+    float3 rayDirection = normalize(rayEnd - rayOrigin);
+
+    // Initialize planet parameters
+    planetCenter = PassSrg::m_constants.m_planetOrigin * 1000;
+    earthRadius = PassSrg::m_constants.m_bottomRadius * 1000;
+    cloudsBottomRadius = earthRadius + PassSrg::m_constants.m_cloudsBottomHeight * 1000;
+    cloudsTopRadius = earthRadius + PassSrg::m_constants.m_cloudsTopHeight * 1000;
+
+    float planetIntersect = RaySphereClosestHitWS(planetCenter, earthRadius, rayOrigin, rayDirection);
+    float innerCloudIntersect = RaySphereClosestHitWS(planetCenter, cloudsBottomRadius, rayOrigin, rayDirection);
+    float outerCloudIntersect = RaySphereClosestHitWS(planetCenter, cloudsTopRadius, rayOrigin, rayDirection);
+
+    // if we intersected a planet, we exit as there are no clouds under ground :)
+    if (planetIntersect > 0.0)
+    {
+        return float4(0.0, 0.0, 0.0, 0.0);
+    }
+
+    // We only account for situation where we are between the planet and clouds as noted above
+    // Validate segment
+    if (outerCloudIntersect <= innerCloudIntersect || innerCloudIntersect < 0.0)
+    {
+        return float4(1.0, 0.0, 0.0, 1.0);
+    }
+
+    // Start and end points
+    float3 start = rayOrigin + rayDirection * innerCloudIntersect;
+    float3 end = rayOrigin + rayDirection * outerCloudIntersect;
+
+    // TODO: introduce back dithering
+    float4 rayMarchResult = RayMarch(int2(screenCoords), start, end);
+
+    // This gives nice balance between over dimming due to aerial perspective applied later and no aerial perspective (for 0 distance)
+    rayMarchResult.b = saturate(innerCloudIntersect / cloudsBottomRadius);
+    return rayMarchResult;
+}

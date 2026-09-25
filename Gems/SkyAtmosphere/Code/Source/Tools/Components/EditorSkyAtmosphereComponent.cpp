@@ -214,6 +214,116 @@ namespace SkyAtmosphere
                             ->Attribute(AZ::Edit::Attributes::Min, 1)
                             ->Attribute(AZ::Edit::Attributes::Max, 64)
                         ->EndGroup()
+
+                        ->ClassElement(AZ::Edit::ClassElements::Group,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Volumetric clouds"))
+                        ->Attribute(AZ::Edit::Attributes::AutoExpand, false)
+                        ->DataElement(AZ::Edit::UIHandlers::CheckBox, &SkyAtmosphereComponentConfig::m_volumetricCloudsEnabled,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Enable volumetric clouds"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Enable rendering of volumetric clouds"))
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_cloudsBottomHeight,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Clouds bottom height"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Height at which clouds start"))
+                            ->Attribute(AZ::Edit::Attributes::Suffix,
+                                QT_TRANSLATE_NOOP("SkyAtmosphere", " km"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 100.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_cloudsTopHeight,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Clouds top height"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Height at which clouds end"))
+                            ->Attribute(AZ::Edit::Attributes::Suffix,
+                                QT_TRANSLATE_NOOP("SkyAtmosphere", " km"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 100.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_baseScale,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Base scale"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Scale of the base noise texture"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 200.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_detailScale,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Detail scale"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Scale of the detail noise texture"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 200.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_globalCoverage,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Global coverage"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Global coverage of clouds"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 1.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_windSpeed,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Wind speed"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Wind speed for moving clouds in km"))
+                            ->Attribute(AZ::Edit::Attributes::Suffix,
+                                QT_TRANSLATE_NOOP("SkyAtmosphere", " km"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_windDirection,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Wind direction"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Wind direction for moving clouds in degrees"))
+                            ->Attribute(AZ::Edit::Attributes::Suffix,
+                                QT_TRANSLATE_NOOP("SkyAtmosphere", " deg"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 360.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_globalDensity,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Global density"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Global density of clouds"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 1.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_cloudAbsorption,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Cloud absorption"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Absorption coefficients from clouds"))
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_anvilBias,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Anvil bias"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Anvil bias for cloud rendering"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 1.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_baseMultiplier,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Base multiplier"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Base multiplier for cloud rendering"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 10.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_detailMultiplier,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Detail multiplier"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Detail multiplier for cloud rendering"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 10.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_curliness,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Curliness"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Curliness for cloud rendering"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 10.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_eccentricity,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Eccentricity"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Eccentricity for cloud rendering"))
+                            ->Attribute(AZ::Edit::Attributes::Min, -1.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 1.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_intensity,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Intensity"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Intensity for cloud rendering"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 1.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_spread,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Spread"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Spread for cloud rendering"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 1.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Slider, &SkyAtmosphereComponentConfig::m_ambientStrength,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Ambient strength"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Ambient strength for cloud rendering"))
+                            ->Attribute(AZ::Edit::Attributes::Min, 0.0f)
+                            ->Attribute(AZ::Edit::Attributes::Max, 1.0f)
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_lowFreqTextureAsset,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Low frequency noise texture"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Low frequency noise texture"))
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_highFreqTextureAsset,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "High frequency noise texture"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "High frequency noise texture"))
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_weatherTextureAsset,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Weather texture"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Weather texture"))
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_curlNoiseTextureAsset,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Curl noise texture"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Curl noise texture"))
+                        ->EndGroup()
                     ;
             }
         }

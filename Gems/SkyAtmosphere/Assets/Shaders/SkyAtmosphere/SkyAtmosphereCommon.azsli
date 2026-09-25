@@ -21,6 +21,7 @@ option bool o_enableSun = true;
 option bool o_enableFastSky = true;
 option bool o_enableFastAerialPerspective = true;
 option bool o_enableAerialPerspective = true;
+option bool o_enableVolumetricClouds = false;
 
 #include <Atom/Features/SrgSemantics.azsli>
 
@@ -37,6 +38,11 @@ ShaderResourceGroup PassSrg : SRG_PerPass_WithFallback
     Texture2DArray<float> m_directionalLightShadowmap;
     Texture2DArray<float> m_directionalLightExponentialShadowmap;
     Texture2D<float> m_fullscreenShadow;
+    Texture3D<float4> m_lowFreqNoiseTexture;
+    Texture3D<float4> m_highFreqNoiseTexture;
+    Texture2D<float4> m_weatherMapTexture;
+    Texture2D<float4> m_curlNoiseTexture;
+    Texture2D<float4> m_cloudStorage;
 
     Sampler LinearSampler
     {
@@ -56,6 +62,16 @@ ShaderResourceGroup PassSrg : SRG_PerPass_WithFallback
         AddressU = Clamp;
         AddressV = Clamp;
         AddressW = Clamp;
+    };
+
+    Sampler LinearWrapSampler
+    {
+        MinFilter = Linear;
+        MagFilter = Linear;
+        MipFilter = Linear;
+        AddressU = Wrap;
+        AddressV = Wrap;
+        AddressW = Wrap;
     };
 
     struct Constants 
@@ -101,7 +117,27 @@ ShaderResourceGroup PassSrg : SRG_PerPass_WithFallback
         float  m_aerialDepthFactor;
 
         float3 m_planetOrigin;
-        float  m_pad4; // not used
+        float  m_cloudsBottomHeight;
+
+        float  m_cloudsTopHeight;
+        float  m_baseScale;
+        float  m_detailScale;
+        float  m_globalCoverage;
+
+        float  m_windSpeed;
+        float  m_windDirection;
+        float  m_globalDensity;
+        float  m_cloudAbsorption;
+
+        float  m_anvilBias;
+        float  m_baseMultiplier;
+        float  m_detailMultiplier;
+        float  m_curliness;
+
+        float  m_eccentricity;
+        float  m_intensity;
+        float  m_spread;
+        float  m_ambientStrength;
     };
 
     Constants m_constants;
@@ -207,6 +243,13 @@ void LutTransmittanceParamsToUv(AtmosphereParameters Atmosphere, in float viewHe
     float x_r = rho / H;
 
     uv = float2(x_mu, x_r);
+}
+
+
+// remaps a number x from [a,b] into [c,d] 
+float Remap(float x, float a, float b, float c, float d)
+{
+    return (x-a)/(b-a)*(d-c)+c;
 }
 
 float CornetteShanksMiePhaseFunction(float g, float cosTheta)

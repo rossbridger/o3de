@@ -64,6 +64,12 @@
                     "ImageViewDesc": {
                         "IsArray": 1
                     }
+                },
+                {
+                    "Name": "CloudStorageTexture",
+                    "SlotType": "Input",
+                    "ShaderInputName": "m_cloudStorage",
+                    "ScopeAttachmentUsage": "Shader"
                 }
             ],
             "PassData": {

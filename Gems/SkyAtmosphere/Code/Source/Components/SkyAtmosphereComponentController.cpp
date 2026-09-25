@@ -9,6 +9,7 @@
 #include <Atom/Feature/SkyBox/SkyboxConstants.h>
 #include <Components/SkyAtmosphereComponentController.h>
 #include <AtomLyIntegration/CommonFeatures/CoreLights/DirectionalLightBus.h>
+#include <Atom/RPI.Public/Image/StreamingImage.h>
 
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
@@ -189,6 +190,30 @@ namespace SkyAtmosphere
         {
             params.m_planetOrigin = AZ::Vector3::CreateZero();
         }
+
+        // volumetric clouds params
+        params.m_volumetricCloudsEnabled = m_configuration.m_volumetricCloudsEnabled;
+        params.m_cloudsBottomHeight = m_configuration.m_cloudsBottomHeight;
+        params.m_cloudsTopHeight = m_configuration.m_cloudsTopHeight;
+        params.m_baseScale = m_configuration.m_baseScale;
+        params.m_detailScale = m_configuration.m_detailScale;
+        params.m_globalCoverage = m_configuration.m_globalCoverage;
+        params.m_globalDensity = m_configuration.m_globalDensity;
+        params.m_anvilBias = m_configuration.m_anvilBias;
+        params.m_baseMultiplier = m_configuration.m_baseMultiplier;
+        params.m_detailMultiplier = m_configuration.m_detailMultiplier;
+        params.m_curliness = m_configuration.m_curliness;
+        params.m_eccentricity = m_configuration.m_eccentricity;
+        params.m_intensity = m_configuration.m_intensity;
+        params.m_spread = m_configuration.m_spread;
+        params.m_ambientStrength = m_configuration.m_ambientStrength;
+        params.m_windSpeed = m_configuration.m_windSpeed;
+        params.m_windDirection = m_configuration.m_windDirection;
+        params.m_cloudAbsorption = m_configuration.m_cloudAbsorption;
+        params.m_lowFreqTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_lowFreqTextureAsset);
+        params.m_highFreqTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_highFreqTextureAsset);
+        params.m_weatherMapTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_weatherTextureAsset);
+        params.m_curlNoiseTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_curlNoiseTextureAsset);
     }
 
     void SkyAtmosphereComponentController::Activate(AZ::EntityId entityId)
