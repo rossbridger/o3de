@@ -1,0 +1,56 @@
+/*
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
+ *
+ */
+
+#include <viewsrg_all.srgi>
+#include <Atom/Features/SrgSemantics.azsli>
+#include <Atom/Features/PostProcessing/FullscreenVertex.azsli>
+
+#include <SkyAtmosphereCommon.azsli>
+
+struct PixelOutput {
+    float4 color : SV_Target;
+};
+
+static  const  int num_samples = 56;
+static  const  float density = 0.7;
+static  const  float exposure = 0.8;
+ static const  float co_decay = 0.9;
+static const  float activeDistance = 1.0;
+ static const  float weight = 1.0;
+ static const  float alpha = 0.3;
+
+// Additive radial blur as proposed in GPU gems 3
+float3 RadialBlur(float2 vertexTexCoords, float2 sunTexCoords)
+{
+    float2 deltaTexCoords = (vertexTexCoords - sunTexCoords) * density * (1.0 / float(num_samples));
+    float2 texCoords = vertexTexCoords;
+    float color = PassSrg::m_gaussianBlurImage.SampleLevel(PassSrg::LinearSampler, texCoords, 0.0).r;
+    float decay = 1.0;
+    for (int i = 0; i < num_samples; ++i)
+    {
+        texCoords -= deltaTexCoords;
+        float current_sample = PassSrg::m_gaussianBlurImage.SampleLevel(PassSrg::LinearSampler, texCoords, 0.0).r;
+        current_sample *= decay * weight;
+        color += current_sample;
+        decay *= co_decay;
+    }
+
+    return color * exposure;
+}
+
+// Additive radial blur pixel shader
+PixelOutput RadialBlurPS(VSOutput Input)
+{
+    PixelOutput output;
+    float3 sunDirNdc = mul(ViewSrg::m_viewProjectionMatrix, float4(PassSrg::m_constants.m_sunDirection, 0.0)).xyz;
+    sunDirNdc.xy /= sunDirNdc.w;
+    float2 sunDirTexCoord = sunDirNdc.xy * 0.5 + 0.5;
+
+    output.color = float4(RadialBlur(Input.m_texCoord.xy, sunDirTexCoord), alpha);
+    return output;
+}

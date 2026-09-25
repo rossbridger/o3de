@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) Contributors to the Open 3D Engine Project.
+ * For complete copyright and license terms please see the LICENSE at the root of this distribution.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
+ *
+ */
+
+ // Based on https://github.com/sebh/UnrealEngineSkyAtmosphere by Sébastien Hillaire
+
+#define ENABLE_ATMOSPHERE_SHADOWS 1
+
+#include <viewsrg_all.srgi>
+#include <Atom/Features/SrgSemantics.azsli>
+#include <Atom/Features/PostProcessing/FullscreenVertex.azsli>
+#include <Atom/Features/ColorManagement/TransformColor.azsli>
+
+#include <SkyAtmosphereCommon.azsli>
+
+struct PostProcessPixelOutputStruct
+{
+    float4 m_luminance : SV_Target0;
+    float4 m_reflection : SV_Target1;
+};
+
+PostProcessPixelOutputStruct ColorCompositionPS(VSOutput Input, in uint sampleIndex : SV_SampleIndex)
+{
+    PostProcessPixelOutputStruct output = (PostProcessPixelOutputStruct)0;
+
+    // re-construct the world space coords
+    float2 screenCoords = Input.m_position.xy;
+    float depth = PassSrg::m_depth.Load(screenCoords, sampleIndex).r;
+
+    float2 ndcPos = float2(Input.m_texCoord.x, 1.0f - Input.m_texCoord.y) * 2.0f - 1.0f;
+    float4 projectedPos = float4(ndcPos, depth, 1.0f);
+    float4 positionWS = mul(ViewSrg::m_viewProjectionInverseMatrix, projectedPos);
+    float3 viewToPosition =  positionWS.xyz / positionWS.w - ViewSrg::m_worldPosition;
+    const float worldDepth = length(viewToPosition);
+
+    if (o_enableVolumetricClouds)
+    {
+        if (depth == 0.0f)
+        {
+            float4 cloudColor = PassSrg::m_cloudColorImage.Sample(PassSrg::LinearSampler, Input.m_texCoord.xy);
+            float3 lightColor = cloudColor.r * PassSrg::m_constants.m_sunColor;
+            float3 ambientColor = cloudColor.g * float3(59.0 / 255.0, 110.0 / 255.0, 219.0 / 255.0); // TODO: ambient color at zenith
+            output.m_luminance.rgb = lightColor + ambientColor;
+            output.m_luminance.a = cloudColor.b;
+        }
+    }
+
+    output.m_reflection = output.m_luminance;
+    return output;
+}

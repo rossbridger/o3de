@@ -1,0 +1,55 @@
+{
+    "Type": "JsonSerialization",
+    "Description" : "This is the pass template that renders the sky atmosphere",
+    "Version": 1,
+    "ClassName": "PassAsset",
+    "ClassData": {
+        "PassTemplate": {
+            "Name": "SkyColorCompositionTemplate",
+            "PassClass": "FullScreenTriangle",
+            "Slots": [
+
+                {
+                    "Name": "SpecularInputOutput",
+                    "SlotType": "InputOutput",
+                    "ScopeAttachmentUsage": "RenderTarget"
+                },
+                {
+                    "Name": "ReflectionInputOutput",
+                    "SlotType": "InputOutput",
+                    "ScopeAttachmentUsage": "RenderTarget"
+                },
+                {
+                    "Name": "DepthStencilTextureInput",
+                    "SlotType": "Input",
+                    "ScopeAttachmentUsage": "Shader",
+                    "ShaderInputName": "m_depth",
+                    "ImageViewDesc": {
+                        "AspectFlags": [
+                            "Depth"
+                        ]
+                    }
+                },
+                {
+                    "Name": "CloudColorImage",
+                    "SlotType": "Input",
+                    "ShaderInputName": "m_cloudColorImage",
+                    "ScopeAttachmentUsage": "Shader"
+                },
+                {
+                    "Name": "GodRaysImage",
+                    "SlotType": "Input",
+                    "ShaderInputName": "m_godRaysImage",
+                    "ScopeAttachmentUsage": "Shader"
+                }
+            ],
+            "PassData": {
+                "$type": "FullscreenTrianglePassData",
+                "ShaderAsset": {
+                    "FilePath": "Shaders/SkyAtmosphere/SkyColorComposition.shader"
+                },
+                "BindViewSrg": true
+            }
+        }
+    }
+}

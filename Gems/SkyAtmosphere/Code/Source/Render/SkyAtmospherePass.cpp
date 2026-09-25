@@ -199,6 +199,7 @@ namespace SkyAtmosphere
         m_skyTransmittanceLUTPass = FindChildPass(AZ::Name("SkyTransmittanceLUTPass"));
         m_skyViewLUTPass = FindChildPass(AZ::Name("SkyViewLUTPass"));
         m_skyVolumeLUTPass = FindChildPass(AZ::Name("SkyVolumeLUTPass"));
+        m_skyVolumetricCloudsPass = FindChildPass(AZ::Name("SkyVolumetricCloudsPass"));
 
         BindLUTs();
 
@@ -217,11 +218,26 @@ namespace SkyAtmosphere
             passData.m_shaderOptionGroup.SetValue(AZ::Name("o_enableSun"), AZ::RPI::ShaderOptionValue{ m_enableSun });
             passData.m_shaderOptionGroup.SetValue(AZ::Name("o_enableFastAerialPerspective"), AZ::RPI::ShaderOptionValue{ m_fastAerialPerspectiveEnabled });
             passData.m_shaderOptionGroup.SetValue(AZ::Name("o_enableAerialPerspective"), AZ::RPI::ShaderOptionValue{ m_aerialPerspectiveEnabled });
+            passData.m_shaderOptionGroup.SetValue(AZ::Name("o_enableVolumetricClouds"), AZ::RPI::ShaderOptionValue{ m_enableVolumetricClouds });
 
             const auto& pass = m_children[childIndex];
             if (auto fullscreenPass = azrtti_cast<AZ::RPI::FullscreenTrianglePass*>(pass); fullscreenPass != nullptr)
             {
                 fullscreenPass->UpdateShaderOptions(passData.m_shaderOptionGroup.GetShaderVariantId());
+                if (m_enableVolumetricClouds)
+                {
+                    auto index = passData.m_srg->FindShaderInputImageIndex(AZ::Name{ "m_weatherMapTexture" });
+                    passData.m_srg->SetImage(index, m_atmosphereParams.m_weatherMapTexture);
+                    
+                    index = passData.m_srg->FindShaderInputImageIndex(AZ::Name{ "m_lowFreqNoiseTexture" });
+                    passData.m_srg->SetImage(index, m_atmosphereParams.m_lowFreqTexture);
+                    
+                    index = passData.m_srg->FindShaderInputImageIndex(AZ::Name{ "m_highFreqNoiseTexture" });
+                    passData.m_srg->SetImage(index, m_atmosphereParams.m_highFreqTexture);
+                    
+                    index = passData.m_srg->FindShaderInputImageIndex(AZ::Name{ "m_curlNoiseTexture" });
+                    passData.m_srg->SetImage(index, m_atmosphereParams.m_curlNoiseTexture);
+                }
             }
             else if (auto computePass = azrtti_cast<AZ::RPI::ComputePass*>(pass); computePass != nullptr)
             {
@@ -300,6 +316,14 @@ namespace SkyAtmosphere
             if (enableVolumePass != m_skyVolumeLUTPass->IsEnabled())
             {
                 m_skyVolumeLUTPass->SetEnabled(enableVolumePass);
+            }
+        }
+
+        if (m_skyVolumetricCloudsPass)
+        {
+            if (m_enableVolumetricClouds != m_skyVolumetricCloudsPass->IsEnabled())
+            {
+                m_skyVolumetricCloudsPass->SetEnabled(m_enableVolumetricClouds);
             }
         }
 
@@ -396,7 +420,25 @@ namespace SkyAtmosphere
         m_fastAerialPerspectiveEnabled = params.m_fastAerialPerspectiveEnabled;
         m_aerialPerspectiveEnabled = params.m_aerialPerspectiveEnabled;
         m_enableSun = params.m_sunEnabled;
+        m_enableVolumetricClouds = params.m_volumetricCloudsEnabled;
 
+        m_constants.m_cloudsBottomHeight = params.m_cloudsBottomHeight;
+        m_constants.m_cloudsTopHeight = params.m_cloudsTopHeight;
+        m_constants.m_baseScale = params.m_baseScale;
+        m_constants.m_detailScale = params.m_detailScale;
+        m_constants.m_globalCoverage = params.m_globalCoverage;
+        m_constants.m_globalDensity = params.m_globalDensity;
+        m_constants.m_anvilBias = params.m_anvilBias;
+        m_constants.m_baseMultiplier = params.m_baseMultiplier;
+        m_constants.m_detailMultiplier = params.m_detailMultiplier;
+        m_constants.m_curliness = params.m_curliness;
+        m_constants.m_eccentricity = params.m_eccentricity;
+        m_constants.m_intensity = params.m_intensity;
+        m_constants.m_spread = params.m_spread;
+        m_constants.m_ambientStrength = params.m_ambientStrength;
+        m_constants.m_windDirection = params.m_windDirection;
+        m_constants.m_windSpeed = params.m_windSpeed;
+        m_constants.m_cloudAbsorption = params.m_cloudAbsorption;
 
         // UpdateRenderPassSRG can be called before the child passes are ready
         // so we store the constants and set them in FrameBeginInternal 

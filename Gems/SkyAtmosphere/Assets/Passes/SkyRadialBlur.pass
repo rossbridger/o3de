@@ -1,0 +1,32 @@
+{
+    "Type": "JsonSerialization",
+    "Description": "This is the pass template that renders the sky volume LUT",
+    "Version": 1,
+    "ClassName": "PassAsset",
+    "ClassData": {
+        "PassTemplate": {
+            "Name": "SkyRadialBlurTemplate",
+            "PassClass": "FullScreenTriangle",
+            "Slots": [
+                {
+                    "Name": "GaussianBlurInput",
+                    "SlotType": "Input",
+                    "ShaderInputName": "m_gaussianBlurImage",
+                    "ScopeAttachmentUsage": "Shader"
+                },
+                {
+                    "Name": "GodRaysOutput",
+                    "SlotType": "Output",
+                    "ScopeAttachmentUsage": "RenderTarget"
+                }
+            ],
+            "PassData": {
+                "$type": "FullscreenTrianglePassData",
+                "ShaderAsset": {
+                    "FilePath": "Shaders/SkyAtmosphere/SkyRadialBlur.shader"
+                },
+                "BindViewSrg": true
+            }
+        }
+    }
+}

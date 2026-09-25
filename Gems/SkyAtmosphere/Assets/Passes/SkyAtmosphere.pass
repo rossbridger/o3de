@@ -64,6 +64,69 @@
                     ]
                 },
                 {
+                    "Name": "SkyVolumetricCloudsPass",
+                    "TemplateName": "SkyVolumetricCloudsTemplate",
+                    "Enabled": true,
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputDepthStencil",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "SkyBoxDepth"
+                            }
+                        },
+                        {
+                            "LocalSlot": "CloudColorImage",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "CloudColorImage"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Name": "SkyGaussianBlurPass",
+                    "TemplateName": "SkyGaussianBlurTemplate",
+                    "Enabled": true,
+                    "Connections": [
+                        {
+                            "LocalSlot": "CloudColorImage",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "CloudColorImage"
+                            }
+                        },
+                        {
+                            "LocalSlot": "GaussianBlurOutput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "GaussianBlurImage"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Name": "SkyRadialBlurPass",
+                    "TemplateName": "SkyRadialBlurTemplate",
+                    "Enabled": true,
+                    "Connections": [
+                        {
+                            "LocalSlot": "GaussianBlurInput",
+                            "AttachmentRef": {
+                                "Pass": "SkyGaussianBlurPass",
+                                "Attachment": "GaussianBlurOutput"
+                            }
+                        },
+                        {
+                            "LocalSlot": "GodRaysOutput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "GodRaysImage"
+                            }
+                        }
+                    ]
+                },
+                {
                     "Name": "SkyRayMarchingPass",
                     "TemplateName": "SkyRayMarchingTemplate",
                     "Enabled": true,
@@ -125,6 +188,90 @@
                             }
                         }
                     ]
+                },
+                {
+                    "Name": "SkyColorCompositionPass",
+                    "TemplateName": "SkyColorCompositionTemplate",
+                    "Enabled": true,
+                    "Connections": [
+                        {
+                            "LocalSlot": "SpecularInputOutput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "SpecularInputOutput"
+                            }
+                        },
+                        {
+                            "LocalSlot": "ReflectionInputOutput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "ReflectionInputOutput"
+                            }
+                        },
+                        {
+                            "LocalSlot": "DepthStencilTextureInput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "SkyBoxDepth"
+                            }
+                        },
+                        {
+                            "LocalSlot": "CloudColorImage",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "CloudColorImage"
+                            }
+                        },
+                        {
+                            "LocalSlot": "GodRaysImage",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "GodRaysImage"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "ImageAttachments": [
+                {
+                    "Name": "CloudColorImage",
+                    "SizeSource": {
+                        "Source": {
+                            "Pass": "This",
+                            "Attachment": "SpecularInputOutput"
+                        },
+                        "Multipliers": { // TODO: initialize it in C++ as other attachments
+                            "WidthMultiplier": 0.25,
+                            "HeightMultiplier": 0.25
+                        }
+                    },
+                    "ImageDescriptor": {
+                        "Format": "R16G16B16A16_FLOAT"
+                    }
+                },
+                {
+                    "Name": "GaussianBlurImage",
+                    "SizeSource": {
+                        "Source": {
+                            "Pass": "This",
+                            "Attachment": "SpecularInputOutput"
+                        }
+                    },
+                    "ImageDescriptor": {
+                        "Format": "R16_FLOAT"
+                    }
+                },
+                {
+                    "Name": "GodRaysImage",
+                    "SizeSource": {
+                        "Source": {
+                            "Pass": "This",
+                            "Attachment": "SpecularInputOutput"
+                        }
+                    },
+                    "ImageDescriptor": {
+                        "Format": "R16G16B16A16_FLOAT"
+                    }
                 }
             ]
         }

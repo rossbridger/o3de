@@ -27,6 +27,22 @@
             {
                 "Name": "SkyRayMarchingTemplate",
                 "Path": "Passes/SkyRayMarching.pass"
+            },
+            {
+                "Name": "SkyVolumetricCloudsTemplate",
+                "Path": "Passes/SkyVolumetricClouds.pass"
+            },
+            {
+                "Name": "SkyColorCompositionTemplate",
+                "Path": "Passes/SkyColorComposition.pass"
+            },
+            {
+                "Name": "SkyGaussianBlurTemplate",
+                "Path": "Passes/SkyGaussianBlur.pass"
+            },
+            {
+                "Name": "SkyRadialBlurTemplate",
+                "Path": "Passes/SkyRadialBlur.pass"
             }
         ]
     }

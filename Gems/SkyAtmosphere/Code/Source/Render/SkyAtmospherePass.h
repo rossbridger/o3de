@@ -103,7 +103,27 @@ namespace SkyAtmosphere
             float m_aerialDepthFactor = 1.f;
 
             float m_planetOrigin[3] = {0.f, 0.f, 0.f};
-            float m_pad4 = 0.f;
+            float m_cloudsBottomHeight = 6.f; // km
+
+            float m_cloudsTopHeight = 16.5f; // km
+            float m_baseScale = 50.0f;
+            float m_detailScale = 50.0f;
+            float m_globalCoverage = 0.0f;
+
+            float m_windSpeed = 0.0f;
+            float m_windDirection = 0.0f;
+            float m_globalDensity = 0.3f;
+            float m_cloudAbsorption = 0.0042;
+
+            float m_anvilBias = 0.0f;
+            float m_baseMultiplier = 0.8f;
+            float m_detailMultiplier = 0.75f;
+            float m_curliness = 2.0f;
+
+            float m_eccentricity = 0.65f;
+            float m_intensity = 0.95f;
+            float m_spread = 1.0f;
+            float m_ambientStrength = 0.25f;
         };
 
         SkyAtmosphereFeatureProcessorInterface::AtmosphereId m_atmosphereId;
@@ -125,6 +145,7 @@ namespace SkyAtmosphere
         AZ::RPI::Ptr<AZ::RPI::Pass> m_skyTransmittanceLUTPass = nullptr;
         AZ::RPI::Ptr<AZ::RPI::Pass> m_skyViewLUTPass = nullptr;
         AZ::RPI::Ptr<AZ::RPI::Pass> m_skyVolumeLUTPass = nullptr;
+        AZ::RPI::Ptr<AZ::RPI::Pass> m_skyVolumetricCloudsPass = nullptr;
 
         AtmosphereGPUParams m_constants;
         SkyAtmosphereParams m_atmosphereParams;
@@ -137,5 +158,6 @@ namespace SkyAtmosphere
         bool m_aerialPerspectiveEnabled = true;
         bool m_enableShadows = false;
         bool m_enableSun = true;
+        bool m_enableVolumetricClouds = false;
     };
 } // AZ::Namespace AZ::Render

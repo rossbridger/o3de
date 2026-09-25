@@ -49,6 +49,7 @@ block()
     set(ASSIMP_BUILD_USD_IMPORTER ON)
     set(ASSIMP_BUILD_USE_CCACHE OFF)
     set(ASSIMP_BUILD_ZLIB OFF)  # Don't rebuild ZLIB. O3DE's comes with its own ZLIB 3rdParty package.
+    set(ASSIMP_BUILD_MINIZIP ON) # Fix build error on Linux
     set(ASSIMP_HUNTER_ENABLED OFF)
     set(ASSIMP_INJECT_DEBUG_POSTFIX OFF)  # Stop Assimp from adding 'd' to debug target outputs (mylibraryd.dll) https://github.com/assimp/assimp/blob/f63625256c4e6f18fca8e7dc857b47a02320e867/CMakeLists.txt#L411
     set(ASSIMP_INSTALL OFF)  # Disable since we're using Assimp as a sub module

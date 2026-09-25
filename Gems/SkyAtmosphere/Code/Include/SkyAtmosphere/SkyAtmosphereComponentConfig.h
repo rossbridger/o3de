@@ -11,6 +11,7 @@
 #include <AzCore/Component/Component.h>
 #include <AzCore/Math/Color.h>
 #include <AzCore/Math/Vector3.h>
+#include <Atom/RPI.Reflect/Image/StreamingImageAsset.h>
 
 namespace SkyAtmosphere
 {
@@ -74,5 +75,29 @@ namespace SkyAtmosphere
         bool m_shadowsEnabled = false;
         uint8_t m_minSamples = 4;
         uint8_t m_maxSamples = 14;
+
+        // volumetric clouds
+        bool m_volumetricCloudsEnabled = false;
+        float m_cloudsBottomHeight = 6;
+        float m_cloudsTopHeight = 16.5;
+        float m_baseScale = 50.f;
+        float m_detailScale = 50.f;
+        float m_globalCoverage = 0.0f;
+        float m_anvilBias = 0.0f;
+        float m_baseMultiplier = 0.8f;
+        float m_detailMultiplier = 0.75f;
+        float m_curliness = 2.0f;
+        float m_eccentricity = 0.65f;
+        float m_intensity = 0.95f;
+        float m_spread = 1.0f;
+        float m_ambientStrength = 0.25f;
+        float m_windSpeed = 0.0f;
+        float m_windDirection = 0.0f;
+        float m_globalDensity = 0.3f;
+        float m_cloudAbsorption = 0.0042f;
+        AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_lowFreqTextureAsset;
+        AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_highFreqTextureAsset;
+        AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_weatherTextureAsset;
+        AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_curlNoiseTextureAsset;
     };
 } // namespace AZ::Render
