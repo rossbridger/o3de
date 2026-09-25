@@ -125,6 +125,7 @@ namespace SkyAtmosphere
         AZ::RPI::Ptr<AZ::RPI::Pass> m_skyTransmittanceLUTPass = nullptr;
         AZ::RPI::Ptr<AZ::RPI::Pass> m_skyViewLUTPass = nullptr;
         AZ::RPI::Ptr<AZ::RPI::Pass> m_skyVolumeLUTPass = nullptr;
+		AZ::RPI::Ptr<AZ::RPI::Pass> m_volumetricCloudsPass = nullptr;
 
         AtmosphereGPUParams m_constants;
         SkyAtmosphereParams m_atmosphereParams;
@@ -137,5 +138,6 @@ namespace SkyAtmosphere
         bool m_aerialPerspectiveEnabled = true;
         bool m_enableShadows = false;
         bool m_enableSun = true;
+		bool m_enableVolumetricClouds = false;
     };
 } // AZ::Namespace AZ::Render

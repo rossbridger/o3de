@@ -199,6 +199,7 @@ namespace SkyAtmosphere
         m_skyTransmittanceLUTPass = FindChildPass(AZ::Name("SkyTransmittanceLUTPass"));
         m_skyViewLUTPass = FindChildPass(AZ::Name("SkyViewLUTPass"));
         m_skyVolumeLUTPass = FindChildPass(AZ::Name("SkyVolumeLUTPass"));
+		m_volumetricCloudsPass = FindChildPass(AZ::Name("VolumetricCloudsComputePass"));
 
         BindLUTs();
 
@@ -217,6 +218,7 @@ namespace SkyAtmosphere
             passData.m_shaderOptionGroup.SetValue(AZ::Name("o_enableSun"), AZ::RPI::ShaderOptionValue{ m_enableSun });
             passData.m_shaderOptionGroup.SetValue(AZ::Name("o_enableFastAerialPerspective"), AZ::RPI::ShaderOptionValue{ m_fastAerialPerspectiveEnabled });
             passData.m_shaderOptionGroup.SetValue(AZ::Name("o_enableAerialPerspective"), AZ::RPI::ShaderOptionValue{ m_aerialPerspectiveEnabled });
+			passData.m_shaderOptionGroup.SetValue(AZ::Name("o_enableVolumetricClouds"), AZ::RPI::ShaderOptionValue{ m_enableVolumetricClouds });
 
             const auto& pass = m_children[childIndex];
             if (auto fullscreenPass = azrtti_cast<AZ::RPI::FullscreenTrianglePass*>(pass); fullscreenPass != nullptr)
@@ -226,6 +228,20 @@ namespace SkyAtmosphere
             else if (auto computePass = azrtti_cast<AZ::RPI::ComputePass*>(pass); computePass != nullptr)
             {
                 computePass->UpdateShaderOptions(passData.m_shaderOptionGroup.GetShaderVariantId());
+				if (m_enableVolumetricClouds)
+				{
+					auto index = passData.m_srg->FindShaderInputImageIndex(AZ::Name{ "m_weatherMapTexture" });
+					passData.m_srg->SetImage(index, m_atmosphereParams.m_weatherMapTexture);
+					
+					index = passData.m_srg->FindShaderInputImageIndex(AZ::Name{ "m_lowFreqNoiseTexture" });
+					passData.m_srg->SetImage(index, m_atmosphereParams.m_lowFreqTexture);
+					
+					index = passData.m_srg->FindShaderInputImageIndex(AZ::Name{ "m_highFreqNoiseTexture" });
+					passData.m_srg->SetImage(index, m_atmosphereParams.m_highFreqTexture);
+					
+					index = passData.m_srg->FindShaderInputImageIndex(AZ::Name{ "m_curlNoiseTexture" });
+					passData.m_srg->SetImage(index, m_atmosphereParams.m_curlNoiseTexture);
+				}
             }
             childIndex++;
         }
@@ -302,6 +318,14 @@ namespace SkyAtmosphere
                 m_skyVolumeLUTPass->SetEnabled(enableVolumePass);
             }
         }
+
+		if (m_volumetricCloudsPass)
+		{
+			if (m_enableVolumetricClouds != m_volumetricCloudsPass->IsEnabled())
+			{
+				m_volumetricCloudsPass->SetEnabled(m_enableVolumetricClouds);
+			}
+		}
 
         Base::FrameBeginInternal(params); 
     }
@@ -396,6 +420,7 @@ namespace SkyAtmosphere
         m_fastAerialPerspectiveEnabled = params.m_fastAerialPerspectiveEnabled;
         m_aerialPerspectiveEnabled = params.m_aerialPerspectiveEnabled;
         m_enableSun = params.m_sunEnabled;
+		m_enableVolumetricClouds = params.m_volumetricCloudsEnabled;
 
 
         // UpdateRenderPassSRG can be called before the child passes are ready

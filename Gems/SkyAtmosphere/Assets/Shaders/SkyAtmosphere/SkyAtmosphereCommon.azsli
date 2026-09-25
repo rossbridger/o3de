@@ -21,6 +21,7 @@ option bool o_enableSun = true;
 option bool o_enableFastSky = true;
 option bool o_enableFastAerialPerspective = true;
 option bool o_enableAerialPerspective = true;
+option bool o_enableVolumetricClouds = false;
 
 #include <Atom/Features/SrgSemantics.azsli>
 
@@ -37,6 +38,12 @@ ShaderResourceGroup PassSrg : SRG_PerPass_WithFallback
     Texture2DArray<float> m_directionalLightShadowmap;
     Texture2DArray<float> m_directionalLightExponentialShadowmap;
     Texture2D<float> m_fullscreenShadow;
+    Texture3D<float4> m_lowFreqNoiseTexture;
+    Texture3D<float4> m_highFreqNoiseTexture;
+    Texture2D<float4> m_weatherMapTexture;
+    Texture2D<float4> m_curlNoiseTexture;
+    Texture2D<float4> m_cloudStorage;
+    RWTexture2D<float4> m_cloudStorageOutput;
 
     Sampler LinearSampler
     {
@@ -56,6 +63,16 @@ ShaderResourceGroup PassSrg : SRG_PerPass_WithFallback
         AddressU = Clamp;
         AddressV = Clamp;
         AddressW = Clamp;
+    };
+
+    Sampler LinearWrapSampler
+    {
+        MinFilter = Linear;
+        MagFilter = Linear;
+        MipFilter = Linear;
+        AddressU = Wrap;
+        AddressV = Wrap;
+        AddressW = Wrap;
     };
 
     struct Constants 

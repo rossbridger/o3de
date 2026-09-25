@@ -9,6 +9,7 @@
 #include <Atom/Feature/SkyBox/SkyboxConstants.h>
 #include <Components/SkyAtmosphereComponentController.h>
 #include <AtomLyIntegration/CommonFeatures/CoreLights/DirectionalLightBus.h>
+#include <Atom/RPI.Public/Image/StreamingImage.h>
 
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/SerializeContext.h>
@@ -189,6 +190,13 @@ namespace SkyAtmosphere
         {
             params.m_planetOrigin = AZ::Vector3::CreateZero();
         }
+
+		// volumetric clouds params
+		params.m_volumetricCloudsEnabled = m_configuration.m_volumetricCloudsEnabled;
+		params.m_lowFreqTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_lowFreqTextureAsset);
+		params.m_highFreqTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_highFreqTextureAsset);
+		params.m_weatherMapTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_weatherTextureAsset);
+		params.m_curlNoiseTexture = AZ::RPI::StreamingImage::FindOrCreate(m_configuration.m_curlNoiseTextureAsset);
     }
 
     void SkyAtmosphereComponentController::Activate(AZ::EntityId entityId)

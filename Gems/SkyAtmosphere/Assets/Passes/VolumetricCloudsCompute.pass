@@ -1,0 +1,41 @@
+{
+    "Type": "JsonSerialization",
+    "Description": "This is the pass template that renders the sky volume LUT",
+    "Version": 1,
+    "ClassName": "PassAsset",
+    "ClassData": {
+        "PassTemplate": {
+            "Name": "VolumetricCloudsComputePassTemplate",
+            "PassClass": "ComputePass",
+            "Slots": [
+                {
+                    "Name": "InputDepthStencil",
+                    "SlotType": "Input",
+                    "ShaderInputName": "m_depth",
+                    "ScopeAttachmentUsage": "Shader",
+                    "ImageViewDesc": {
+                        "AspectFlags": [
+                            "Depth"
+                        ]
+                    }
+                },
+                {
+                    "Name": "CloudStorageTexture",
+                    "SlotType": "Output",
+                    "ShaderInputName": "m_cloudStorageOutput",
+                    "ScopeAttachmentUsage": "Shader"
+                }
+            ],
+            "PassData": {
+                "$type": "ComputePassData",
+                "FullscreenDispatch": true,
+                "FullscreenSizeSourceSlotName": "CloudStorageTexture",
+
+                "ShaderAsset": {
+                    "FilePath": "Shaders/SkyAtmosphere/VolumetricCloudsCompute.shader"
+                },
+                "BindViewSrg": true
+            }
+        }
+    }
+}

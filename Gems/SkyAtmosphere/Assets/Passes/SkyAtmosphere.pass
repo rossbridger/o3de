@@ -64,6 +64,27 @@
                     ]
                 },
                 {
+                    "Name": "VolumetricCloudsComputePass",
+                    "TemplateName": "VolumetricCloudsComputeTemplate",
+                    "Enabled": true,
+                    "Connections": [
+                        {
+                            "LocalSlot": "InputDepthStencil",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "SkyBoxDepth"
+                            }
+                        },
+                        {
+                            "LocalSlot": "CloudStorageTexture",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "CloudStorageTexture"
+                            }
+                        }
+                    ]
+                },
+                {
                     "Name": "SkyRayMarchingPass",
                     "TemplateName": "SkyRayMarchingTemplate",
                     "Enabled": true,
@@ -123,8 +144,33 @@
                                 "Pass": "Parent",
                                 "Attachment": "DirectionalESM"
                             }
+                        },
+                        {
+                            "LocalSlot": "CloudStorageTexture",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "CloudStorageTexture"
+                            }
                         }
                     ]
+                }
+            ],
+            "ImageAttachments": [
+                {
+                    "Name": "CloudStorageTexture",
+                    "SizeSource": {
+                        "Source": {
+                            "Pass": "This",
+                            "Attachment": "SpecularInputOutput"
+                        },
+                        "Multipliers": { // TODO: initialize it in C++ as other attachments
+                            "WidthMultiplier": 0.25,
+                            "HeightMultiplier": 0.25
+                        }
+                    },
+                    "ImageDescriptor": {
+                        "Format": "R16G16B16A16_FLOAT"
+                    }
                 }
             ]
         }

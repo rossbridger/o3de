@@ -9,6 +9,7 @@
 #pragma once
 
 #include <Atom/RPI.Public/FeatureProcessor.h>
+#include <Atom/RPI.Reflect/Image/Image.h>
 #include <AzCore/Math/Color.h>
 
 namespace SkyAtmosphere
@@ -45,6 +46,13 @@ namespace SkyAtmosphere
         bool m_fastSkyEnabled;
         bool m_fastAerialPerspectiveEnabled;
         bool m_aerialPerspectiveEnabled;
+
+		//! Volumetric clouds params
+		bool m_volumetricCloudsEnabled;
+		AZ::Data::Instance<AZ::RPI::Image> m_lowFreqTexture;
+		AZ::Data::Instance<AZ::RPI::Image> m_highFreqTexture;
+		AZ::Data::Instance<AZ::RPI::Image> m_weatherMapTexture;
+		AZ::Data::Instance<AZ::RPI::Image> m_curlNoiseTexture;
     };
 
     class SkyAtmosphereFeatureProcessorInterface

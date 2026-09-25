@@ -214,6 +214,26 @@ namespace SkyAtmosphere
                             ->Attribute(AZ::Edit::Attributes::Min, 1)
                             ->Attribute(AZ::Edit::Attributes::Max, 64)
                         ->EndGroup()
+
+                        ->ClassElement(AZ::Edit::ClassElements::Group,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Volumetric clouds"))
+                        ->Attribute(AZ::Edit::Attributes::AutoExpand, false)
+                        ->DataElement(AZ::Edit::UIHandlers::CheckBox, &SkyAtmosphereComponentConfig::m_volumetricCloudsEnabled,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Enable volumetric clouds"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Enable rendering of volumetric clouds"))
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_lowFreqTextureAsset,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Low frequency noise texture"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Low frequency noise texture"))
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_highFreqTextureAsset,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "High frequency noise texture"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "High frequency noise texture"))
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_weatherTextureAsset,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Weather texture"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Weather texture"))
+                        ->DataElement(AZ::Edit::UIHandlers::Default, &SkyAtmosphereComponentConfig::m_curlNoiseTextureAsset,
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Curl noise texture"),
+                            QT_TRANSLATE_NOOP("SkyAtmosphere", "Curl noise texture"))
+                        ->EndGroup()
                     ;
             }
         }

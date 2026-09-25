@@ -8,6 +8,7 @@
 
 #include <SkyAtmosphere/SkyAtmosphereComponentConfig.h>
 #include <AzCore/Serialization/SerializeContext.h>
+#include <AzCore/Asset/AssetSerializer.h>
 
 namespace SkyAtmosphere
 {
@@ -48,6 +49,11 @@ namespace SkyAtmosphere
                 ->Field("FastAerialPerspectiveEnabled", &SkyAtmosphereComponentConfig::m_fastAerialPerspectiveEnabled)
                 ->Field("AerialPerspectiveEnabled", &SkyAtmosphereComponentConfig::m_aerialPerspectiveEnabled)
                 ->Field("AerialDepthFactor", &SkyAtmosphereComponentConfig::m_aerialDepthFactor)
+                ->Field("VolumetricCloudsEnabled", &SkyAtmosphereComponentConfig::m_volumetricCloudsEnabled)
+                ->Field("LowFreqTextureAsset", &SkyAtmosphereComponentConfig::m_lowFreqTextureAsset)
+                ->Field("HighFreqTextureAsset", &SkyAtmosphereComponentConfig::m_highFreqTextureAsset)
+                ->Field("WeatherTextureAsset", &SkyAtmosphereComponentConfig::m_weatherTextureAsset)
+                ->Field("CurlNoiseTextureAsset", &SkyAtmosphereComponentConfig::m_curlNoiseTextureAsset)
                 ;
         }
     }

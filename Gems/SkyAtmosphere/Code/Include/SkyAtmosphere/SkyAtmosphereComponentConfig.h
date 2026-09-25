@@ -11,6 +11,7 @@
 #include <AzCore/Component/Component.h>
 #include <AzCore/Math/Color.h>
 #include <AzCore/Math/Vector3.h>
+#include <Atom/RPI.Reflect/Image/StreamingImageAsset.h>
 
 namespace SkyAtmosphere
 {
@@ -74,5 +75,12 @@ namespace SkyAtmosphere
         bool m_shadowsEnabled = false;
         uint8_t m_minSamples = 4;
         uint8_t m_maxSamples = 14;
+
+		// volumetric clouds
+		bool m_volumetricCloudsEnabled = false;
+		AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_lowFreqTextureAsset;
+		AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_highFreqTextureAsset;
+		AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_weatherTextureAsset;
+		AZ::Data::Asset<AZ::RPI::StreamingImageAsset> m_curlNoiseTextureAsset;
     };
 } // namespace AZ::Render
